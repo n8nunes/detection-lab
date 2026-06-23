@@ -33,6 +33,19 @@ def main():
     scan_parser.add_argument("--rules-dir", required=True, help="Path to Sigma rules directory")
     scan_parser.add_argument("--output", choices=["terminal", "json", "both"], default="terminal", help="Output format")
 
+    # --- ATT&CK MODULE (Phase 3) ---
+    attack_parser = subparsers.add_parser("attack", help="MITRE ATT&CK Mapping and Coverage")
+    attack_sub = attack_parser.add_subparsers(dest="action", required=True, help="ATT&CK actions")
+
+    coverage_p = attack_sub.add_parser("coverage", help="Analyze rule coverage against ATT&CK matrix")
+    coverage_p.add_argument("--rules-dir", required=True, help="Path to Sigma rules directory")
+    coverage_p.add_argument("--refresh-attack", action="store_true", help="Force re-download of ATT&CK matrix")
+
+    navigator_p = attack_sub.add_parser("navigator", help="Export ATT&CK Navigator layer")
+    navigator_p.add_argument("--rules-dir", required=True, help="Path to Sigma rules directory")
+    navigator_p.add_argument("--out", default="navigator_layer.json", help="Output file path")
+    navigator_p.add_argument("--refresh-attack", action="store_true", help="Force re-download of ATT&CK matrix")
+
     args = parser.parse_args()
 
     # Route logic to corresponding modules
@@ -47,6 +60,13 @@ def main():
         sigma.run_rules_list(args)
     elif args.module == "scan":
         sigma.run_scan(args, ingest)
+    elif args.module == "attack":
+        # Lazy import so Phase 1 and 2 don't load requests if not needed
+        from modules import attack
+        if args.action == "coverage":
+            attack.run_coverage(args)
+        elif args.action == "navigator":
+            attack.run_navigator(args)
 
 if __name__ == "__main__":
     try:
