@@ -84,7 +84,7 @@ def parse_evtx(filepath: str) -> tuple[list[dict], list[str]]:
                             fields[name] = data.text
 
                     # Map schema
-                    raw_truncated = xml_str[:300]
+                    raw_truncated = xml_str[:1000]
                     category = WINDOWS_CATEGORY_MAP.get(event_id, "generic")
                     
                     event = {
@@ -130,7 +130,7 @@ def parse_syslog(filepath: str) -> tuple[list[dict], list[str]]:
                         iso_time = _now_iso()
 
                     event = {
-                        "event_uid": _generate_uid(line[:300], iso_time),
+                        "event_uid": _generate_uid(line[:1000], iso_time),
                         "timestamp": iso_time,
                         "source_type": "syslog",
                         "category": category,
@@ -139,7 +139,7 @@ def parse_syslog(filepath: str) -> tuple[list[dict], list[str]]:
                         "host": host,
                         "user": None,
                         "fields": {"process": process_clean, "message": message},
-                        "raw_truncated": line[:300],
+                        "raw_truncated": line[:1000],
                         "ingested_at": _now_iso()
                     }
                     events.append(event)
@@ -156,38 +156,52 @@ def parse_json_log(filepath: str) -> tuple[list[dict], list[str]]:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read().strip()
             
-            # Handle JSON array vs JSONL
             if content.startswith('['):
                 records = json.loads(content)
             else:
                 records = [json.loads(line) for line in content.splitlines() if line.strip()]
 
             for rec in records:
-                # Auto-detect timestamp
                 timestamp = _now_iso()
                 for tc in TIMESTAMP_CANDIDATES:
                     if tc in rec:
                         timestamp = rec[tc]
                         break
                 
-                # Auto-detect host
                 host = None
                 for hc in HOST_CANDIDATES:
                     if hc in rec:
                         host = rec[hc]
                         break
 
-                raw_line = json.dumps(rec)[:300]
+                # --- FIX: Increase truncation limit to 1000 to preserve full CommandLine payloads ---
+                raw_line = json.dumps(rec)[:1000]
+                # ------------------------------------------------------------------------------------
+                
+                event_id = rec.get("event_id", rec.get("EventID", 0))
+
+                is_windows = "EventData" in rec and "EventID" in rec
+                fields = dict(rec)
+                
+                if is_windows and isinstance(rec.get("EventData"), dict):
+                    for data_item in rec["EventData"].get("Data", []):
+                        name = data_item.get("Name")
+                        if name and name in data_item:
+                            fields[name] = data_item[name]
+
+                source_type = "windows_json" if is_windows else "generic_json"
+                category = WINDOWS_CATEGORY_MAP.get(event_id, "generic") if is_windows else "generic"
+
                 event = {
                     "event_uid": _generate_uid(raw_line, timestamp),
                     "timestamp": timestamp,
-                    "source_type": "generic_json",
-                    "category": "generic", # Defaults to generic for basic JSON
-                    "event_id": rec.get("event_id", rec.get("EventID", 0)),
+                    "source_type": source_type,
+                    "category": category,
+                    "event_id": event_id,
                     "severity": "info",
                     "host": host,
                     "user": rec.get("user", rec.get("username")),
-                    "fields": rec,
+                    "fields": fields,
                     "raw_truncated": raw_line,
                     "ingested_at": _now_iso()
                 }

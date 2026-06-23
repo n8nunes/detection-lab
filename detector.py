@@ -46,6 +46,11 @@ def main():
     navigator_p.add_argument("--out", default="navigator_layer.json", help="Output file path")
     navigator_p.add_argument("--refresh-attack", action="store_true", help="Force re-download of ATT&CK matrix")
 
+    # --- ENRICH MODULE (Phase 4) ---
+    enrich_parser = subparsers.add_parser("enrich", help="Extract and enrich IOCs from rule matches")
+    enrich_parser.add_argument("--scan-results", default="scan_results.json", help="Path to the Phase 2 scan results file")
+    enrich_parser.add_argument("--out", default="enrichment_results.json", help="Output JSON file for boolean enrichment flags")
+
     args = parser.parse_args()
 
     # Route logic to corresponding modules
@@ -67,6 +72,10 @@ def main():
             attack.run_coverage(args)
         elif args.action == "navigator":
             attack.run_navigator(args)
+    elif args.module == "enrich":
+        from modules import enrich
+        enrich.run_enrich(args)
+    
 
 if __name__ == "__main__":
     try:
