@@ -30,20 +30,16 @@ The tool is developed through a phased development roadmap:
 
 This lab prioritises security and engineering excellence:
 
-* 
-**Privacy-First:** The AI backend is never provided with raw, un-sanitised log data, IP addresses, or PII. It only receives pre-structured, anonymised summaries.
+* **Privacy-First:** The AI backend is never provided with raw, un-sanitised log data, IP addresses, or PII. It only receives pre-structured, anonymised summaries.
 
 
-* 
-**Modular Architecture:** Detection logic is strictly decoupled from the detection content (YAML rules), allowing users to curate their own rulesets without modifying the codebase.
+* **Modular Architecture:** Detection logic is strictly decoupled from the detection content (YAML rules), allowing users to curate their own rulesets without modifying the codebase.
 
 
-* 
-**Performance & Efficiency:** Through rigorous token management, atomic file I/O operations, and optimised regex extraction, the tool is designed to remain lightweight and highly performant.
+* **Performance & Efficiency:** Through rigorous token management, atomic file I/O operations, and optimised regex extraction, the tool is designed to remain lightweight and highly performant.
 
 
-* 
-**Standardisation:** All outputs utilise the `Rich` library for clear, actionable terminal rendering, ensuring high visibility during incident triage.
+* **Standardisation:** All outputs utilise the `Rich` library for clear, actionable terminal rendering, ensuring high visibility during incident triage.
 
 
 
