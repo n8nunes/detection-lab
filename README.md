@@ -10,24 +10,19 @@ The project serves as a foundational platform for learning and implementing mode
 
 The tool is developed through a phased development roadmap:
 
-* 
-**Phase 1: Ingestion & Normalisation:** Converts diverse log formats (Windows EVTX, Linux Syslog, JSON) into a unified, normalised schema for consistent downstream processing.
+* **Phase 1: Ingestion & Normalisation:** Converts diverse log formats (Windows EVTX, Linux Syslog, JSON) into a unified, normalised schema for consistent downstream processing.
 
 
-* 
-**Phase 2: Sigma Rule Engine:** Implements a high-performance, offline logic engine to evaluate normalised events against Sigma YAML rules, enabling rapid detection of adversarial patterns.
+* **Phase 2: Sigma Rule Engine:** Implements a high-performance, offline logic engine to evaluate normalised events against Sigma YAML rules, enabling rapid detection of adversarial patterns.
 
 
-* 
-**Phase 3: MITRE ATT&CK Mapping:** Automates the mapping of detected threats to the MITRE ATT&CK framework, providing coverage gap analysis and generating Navigator-compatible heatmap layers.
+* **Phase 3: MITRE ATT&CK Mapping:** Automates the mapping of detected threats to the MITRE ATT&CK framework, providing coverage gap analysis and generating Navigator-compatible heatmap layers.
 
 
-* 
-**Phase 4: IOC Enrichment Pipeline:** Automatically extracts indicators of compromise (IOCs) and enriches them via external threat intelligence (AbuseIPDB and VirusTotal), utilising robust, de-obfuscation-ready extraction methods.
+* **Phase 4: IOC Enrichment Pipeline:** Automatically extracts indicators of compromise (IOCs) and enriches them via external threat intelligence (AbuseIPDB and VirusTotal), utilising robust, de-obfuscation-ready extraction methods.
 
 
-* 
-**Phase 5: AI-Assisted Triage:** Employs a strictly constrained, single-pass Ollama integration to perform intelligent verdict assessment on matched alerts while maintaining robust safeguards against AI bias and data leakage.
+* **Phase 5: AI-Assisted Triage:** Employs a strictly constrained, single-pass Ollama integration to perform intelligent verdict assessment on matched alerts while maintaining robust safeguards against AI bias and data leakage.
 
 
 
