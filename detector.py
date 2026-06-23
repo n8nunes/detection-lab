@@ -51,6 +51,22 @@ def main():
     enrich_parser.add_argument("--scan-results", default="scan_results.json", help="Path to the Phase 2 scan results file")
     enrich_parser.add_argument("--out", default="enrichment_results.json", help="Output JSON file for boolean enrichment flags")
 
+    # --- TRIAGE MODULE (Phase 5) ---
+    triage_parser = subparsers.add_parser("triage", help="AI-assisted triage of rule matches")
+    triage_sub = triage_parser.add_subparsers(dest="action", required=True, help="Triage actions")
+
+    triage_run_p = triage_sub.add_parser("run", help="Execute single-pass AI triage pipeline")
+    triage_run_p.add_argument("--scan-results", default="scan_results.json", help="Path to Phase 2 scan results")
+    triage_run_p.add_argument("--enrich-results", default="enrichment_results.json", help="Path to Phase 4 enrich results")
+
+    triage_over_p = triage_sub.add_parser("override", help="Manual human override of AI verdict")
+    triage_over_p.add_argument("--id", required=True, help="The 8-character ID of the triage record")
+    triage_over_p.add_argument("--verdict", required=True, choices=["Escalate", "Monitor", "False Positive"], help="New verdict")
+
+    # --- REPORT MODULE (Phase 5) ---
+    report_parser = subparsers.add_parser("report", help="Export triaged records to JSON report")
+    report_parser.add_argument("--out", default="triage_report.json", help="Output filepath")
+
     args = parser.parse_args()
 
     # Route logic to corresponding modules
@@ -75,6 +91,15 @@ def main():
     elif args.module == "enrich":
         from modules import enrich
         enrich.run_enrich(args)
+    elif args.module == "triage":
+        from modules import triage
+        if args.action == "run":
+            triage.run_triage(args)
+        elif args.action == "override":
+            triage.run_override(args)
+    elif args.module == "report":
+        from modules import triage
+        triage.run_report(args)
     
 
 if __name__ == "__main__":
